@@ -4,11 +4,10 @@ import numpy as np
 import CNN_BuildingBlock_Lib as CNN_BB
 import RNN_BuildingBlock_Lib as RNN_BB
 
-import CNN_Lib as cnn_lib
 import pdb
 
 class CombinationModel_LSTM_FCN(nn.Module):
-    def __init__(self, in_channels, seq_len, hidden_dim, num_layers, non_linearity, initialization, out_channels, cnnfilter_size, cnnfilter_stride, cnn_pad, use_bias, num_classes, use_maxpool, pool_size, pool_stride, use_batchnorm, eps=1e-5, momentum=0.9, affine=False, dropout = 0):
+    def __init__(self, in_channels, seq_len, hidden_dim, num_layers, out_channels, cnnfilter_size, cnnfilter_stride, cnn_pad, use_bias, num_classes, use_maxpool, pool_size, pool_stride, use_batchnorm, eps=1e-5, momentum=0.9, affine=False, dropout = 0):
         """
         Using Repeatable Blocks to create combined model. 
         A) Variation of RNN
@@ -44,7 +43,7 @@ class CombinationModel_LSTM_FCN(nn.Module):
         #building blocks 
         
         
-        self.LSTM = nn.LSTM(in_channels, hidden_dim, num_layers =1)
+        self.LSTM = nn.LSTM(in_channels, hidden_dim, num_layers)
         
         
         self.CNN_Block1 = CNN_BB.EEG_CNN_BuildingBlock(in_channels, seq_len, out_channels[0], cnnfilter_size[0], cnnfilter_stride[0], cnn_pad[0], use_bias[0], use_maxpool[0], pool_size[0], pool_stride[0], use_batchnorm[0], eps[0], momentum[0], affine[0], dropout[0])
@@ -56,13 +55,15 @@ class CombinationModel_LSTM_FCN(nn.Module):
         
                 
     def forward(self, x):
+        pdb.set_trace()
         outLSTM, hidden = self.LSTM.forward(x)
         
         x = x.transpose(2,1)
         out = self.CNN_Block1.forward(x)
         out = self.CNN_Block2.forward(out)
-        outCNN = self.CNN_Block3.forward(out)
-        
-        outCat = torch.cat(outLSTM, outCNN)
+        out = self.CNN_Block3.forward(out)
+        outCNN = out.transpose(2,1)
+
+        outCat = torch.cat((outLSTM, outCNN))
         
         return outCat

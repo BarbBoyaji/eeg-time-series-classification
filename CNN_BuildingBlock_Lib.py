@@ -40,8 +40,11 @@ class EEG_CNN_BuildingBlock(nn.Module):
         #CNN Layer
         self.CNN = nn.Conv1d(in_channels, out_channels, cnnfilter_size, stride=cnnfilter_stride, padding=cnn_pad, bias=use_bias, padding_mode='zeros')
         #for use in chaining to another model
-        self.Lout = (seq_len + 2*self.CNN.padding[0] - self.CNN.dilation[0]*(self.CNN.kernel_size[0]-1)-1)/self.CNN.stride[0] +1
         
+        if type(cnn_pad) is int:
+          self.Lout = (seq_len + 2*self.CNN.padding[0] - self.CNN.dilation[0]*(self.CNN.kernel_size[0]-1)-1)/self.CNN.stride[0] +1
+        else:
+          self.Lout = seq_len
         #initialize the CNN weights with Xavier Norm Init
         nn.init.xavier_normal_(self.CNN.weight.data)
         if self.CNN_bias:
@@ -61,9 +64,12 @@ class EEG_CNN_BuildingBlock(nn.Module):
         #MaxPool Layer
         if use_maxpool:
             self.MaxPool = nn.MaxPool1d(pool_size, pool_stride) 
-            #for use in chaining to another model.
-            self.Lout = int((self.Lout + 2*self.MaxPool.padding - self.MaxPool.dilation*(self.MaxPool.kernel_size -1) -1)/self.MaxPool.stride +1)
-        
+            if type(cnn_pad) is int:
+              #for use in chaining to another model.
+              self.Lout = int((self.Lout + 2*self.MaxPool.padding - self.MaxPool.dilation*(self.MaxPool.kernel_size -1) -1)/self.MaxPool.stride +1)
+            else:
+              self.Lout = seq_len
+              
         self.out_channels = self.CNN.out_channels
         
     def forward(self, x):
