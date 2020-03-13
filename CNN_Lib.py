@@ -58,13 +58,13 @@ class EEG_CNN(nn.Module):
         self.MaxPool_Out = Lout     
         
         #Fully Connected Layers
-        self.FC1 = nn.Linear(Lout*out_channels, Lout);
+        self.FC1 = nn.Linear(Lout*out_channels, Lout)
         
         #Dropout in between
         if self.dropoutFC > 0:
-            self.DropOutFC = nn.Dropout(dropoutFC);
+            self.DropOutFC = nn.Dropout(dropoutFC)
             
-        self.FC2 = nn.Linear(Lout, num_classes);
+        self.FC2 = nn.Linear(Lout, num_classes)
         
     def forward(self, x):
         out = self.CNN(x)

@@ -53,9 +53,15 @@ class CombinationModel_LSTM_FCN(nn.Module):
         
         self.CNN_Block3 = CNN_BB.EEG_CNN_BuildingBlock(self.CNN_Block2.out_channels, self.CNN_Block2.Lout, out_channels[2], cnnfilter_size[2], cnnfilter_stride[2], cnn_pad[2], use_bias[2], use_maxpool[2], pool_size[2], pool_stride[2], use_batchnorm[2], eps[2], momentum[2], affine[2], dropout[2] )
         
-                
+        #Fully Connected Layers
+        self.FC1 = nn.Linear(self.CNN_Block3.Lout*self.CNN_Block3.out_channels, self.CNN_Block3.Lout);
+        
+        #Dropout in between
+        self.DropOutFC = nn.Dropout(dropout[3]);
+            
+        self.FC2 = nn.Linear(self.CNN_Block3.Lout, num_classes);   
+        
     def forward(self, x):
-        pdb.set_trace()
         outLSTM, hidden = self.LSTM.forward(x)
         
         x = x.transpose(2,1)
@@ -66,4 +72,13 @@ class CombinationModel_LSTM_FCN(nn.Module):
 
         outCat = torch.cat((outLSTM, outCNN))
         
-        return outCat
+        #Flatten Layer
+        outCat = outCat.reshape(outCat.size(0), self.CNN_Block3.out_channels*self.CNN_Block3.Lout)
+
+        out = self.FC1(outCat)
+        
+        out = self.DropOutFC(out)
+        
+        out = self.FC2(out)
+        
+        return out
