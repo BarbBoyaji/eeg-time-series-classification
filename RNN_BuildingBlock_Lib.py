@@ -4,6 +4,7 @@
 import torch
 from torch import nn
 import numpy as np
+import pdb
 
 class EEG_RNN_BuildingBlock(nn.Module):
     """
@@ -14,14 +15,12 @@ class EEG_RNN_BuildingBlock(nn.Module):
     """
     def __init__(self, num_inputs, hidden_dim, num_layers, non_linearity, initialization, use_cuda=True, num_directions =1):
         super(EEG_RNN_BuildingBlock, self).__init__()
-        
-        
+          
         #check the initialization type
         if not (initialization in ['xavierNorm', 'xavierUniform']):
             raise Exception('ValueErr', 'Not An Option')
             print('Acceptable Options include: xavierNorm, xavierUniform')
-        
-        
+           
         #store own vars
         self.inputsNum = num_inputs
         self.layersNum= num_layers
@@ -54,4 +53,26 @@ class EEG_RNN_BuildingBlock(nn.Module):
             out, hidden_layer = self.RNN(x, self.hidden_layer0.detach())
             return out, hidden_layer   
                                                           
-                                                          
+
+class EEG_LSTM_BuildingBlock(nn.Module):
+    """
+    num_inputs: expected features in input 
+    num_layers: number of recurrent layers
+    nonlinearity: 'tanh' or 'relu'
+    initialization: xavierNorm or xavierUniform
+    """
+    def __init__(self, num_inputs, hidden_dim, num_layers, data_size, dropout):
+        super(EEG_LSTM_BuildingBlock, self).__init__()
+        self.data_size = data_size
+        self.hidden_dim = hidden_dim
+        self.LSTM = nn.LSTM(num_inputs, hidden_dim, num_layers)
+        self.Dropout = nn.Dropout(dropout)
+        self.FC = nn.Linear(data_size*hidden_dim, 4)
+        
+    def forward(self, x):
+        #pdb.set_trace()
+        out = self.LSTM(x)
+        out = self.Dropout(out[0])
+        out = out.reshape(out.size(0), self.data_size*self.hidden_dim)
+        out = self.FC(out)
+        return out

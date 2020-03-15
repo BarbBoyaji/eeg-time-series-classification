@@ -13,7 +13,7 @@ class EEG_RNN(nn.Module):
     dropout: 0 means no dropout, 1 means dropout
     initialization: xavierNorm or xavierUniform
     """
-    def __init__(self, num_inputs, hidden_dim, num_layers, num_steps, num_class, non_linearity, initialization,dropout=0, use_cuda=True):
+    def __init__(self, num_inputs, hidden_dim, num_layers, num_class, non_linearity, initialization, dropout=0, use_cuda=True):
         super(EEG_RNN, self).__init__()
         
         
@@ -28,7 +28,6 @@ class EEG_RNN(nn.Module):
         self.outputsNum= num_class
         self.layersNum= num_layers
         self.hiddenDim = hidden_dim
-        self.steps = num_steps
         self.init = initialization
         self.nonlinearity = non_linearity
         self.use_cuda = use_cuda
