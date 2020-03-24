@@ -1,9 +1,14 @@
 # eeg-time-series-classification
 
-Combination_Model has the 3 layer CNN
-
-RNN_CNN_Combination has an RNN followed by the same CNN architecture in Combination Model
-
-LSTM_CNN_Combination has LSTM and CNN trained together and combined (summed) 
-
 The objective here is the classify the action of a human subject, given 2115 trials of EEG time series data from 22 electrodes, from 9 different people. I'm attempting several as simple as possible architectures and evaluating which one performs best.
+
+* Combination_Model.ipynb has the 3 layer CNN. This model had the best performance
+
+* RNN_CNN_Combination.ipynb has an RNN followed by the same CNN architecture in Combination Model
+
+* LSTM_FCN_Combination.ipynb has LSTM and CNN trained together and combined (summed). This model had the second best performance.
+
+* Parallel_LSTM_CNN.ipynb has 5 LSTMs trained on 200 time points of data each. This architecture performed terribly.
+
+* LSTM_Combination_Model.ipynb has an LSTM followed by fully connected layers. This architecture was also quite bad.
+
