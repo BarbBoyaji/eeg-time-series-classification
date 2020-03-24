@@ -45,32 +45,13 @@ class CombinationModel_LSTM(nn.Module):
         #first tried with non-overlapping chunks.
 
         # Initialize hidden state with zeros
-        h0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim1).requires_grad_()
+        #h0 = torch.zeros(self.in_channels, x.size(0), self.hidden_dim1).requires_grad_()
 
         # Initialize cell state
-        c0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim1).requires_grad_()
+        #c0 = torch.zeros(self.in_channels, x.size(0), self.hidden_dim1).requires_grad_()
 
-        outLSTM1, hidden = self.LSTM1.forward(x, (h0.detach(), c0.detach()))
+        outLSTM1, hidden = self.LSTM1.forward(x)
         outLSTM2, hidden = self.LSTM2.forward(outLSTM1)
-        #outLSTM3, hidden = self.LSTM3.forward(x[:,400:600,:])
-        #outLSTM4, hidden = self.LSTM4.forward(x[:,600:800,:])
-        #outLSTM5, hidden = self.LSTM5.forward(x[:,800:1000,:])
-
-        #overlapping chunks of 200 seemed to do worse and take longer
-        #outLSTM1, hidden = self.LSTM1.forward(x[:,:200,:])
-        #outLSTM2, hidden = self.LSTM2.forward(x[:,150:350,:])
-        #outLSTM3, hidden = self.LSTM3.forward(x[:,300:500,:])
-        #outLSTM4, hidden = self.LSTM4.forward(x[:,450:650,:])
-        #outLSTM5, hidden = self.LSTM5.forward(x[:,650:850,:])
-        #outLSTM6, hidden = self.LSTM5.forward(x[:,800:1000,:])
-
-        #overlapping chunks of bigger size
-        #outLSTM1, hidden = self.LSTM1.forward(x[:,:500,:])
-        #outLSTM2, hidden = self.LSTM2.forward(x[:,300:800,:])
-        #outLSTM3, hidden = self.LSTM3.forward(x[:,500:1000,:])
-
-        #outLSTM, hidden = self.LSTM1.forward(x)
-
         outLSTM = self.DropOutLSTM(outLSTM2)
 
         #Flatten Layer
